@@ -1,0 +1,282 @@
+version: '2'
+services:
+  nginx-proxy:
+        image: jwilder/nginx-proxy:latest
+        container_name: nginx-proxy
+        volumes:
+            - /var/run/docker.sock:/tmp/docker.sock:ro
+        ports:
+            - "80:80"
+        restart: always
+  sabnzbd:
+        image: linuxserver/sabnzbd:latest
+        container_name: sabnzbd
+        volumes:
+            - /var/lib/libvirt/casa/sabnzbd:/config
+            - /data/p2p:/p2p
+        ports:
+            - "8080:8080"
+        env_file: uidgid.env
+        environment:
+            - EDGE=1
+            - VIRTUAL_HOST=nzb.casa.lan
+            - VIRTUAL_PORT=8080
+        restart: always
+  sonarr:
+        image: linuxserver/sonarr
+        container_name: sonarr
+        volumes:
+            - /var/lib/libvirt/casa/sonarr:/config
+            - /etc/localtime:/etc/localtime:ro
+            - /data/videos:/media
+            - /data/transcode/handbrake_p2p:/p2p/complete
+        ports:
+            - "8989:8989"
+        env_file: uidgid.env
+        environment:
+            - VIRTUAL_HOST=series.casa.lan
+            - VIRTUAL_PORT=8989
+        restart: always
+  radarr:
+        image: linuxserver/radarr
+        container_name: radarr
+        volumes:
+            - /var/lib/libvirt/casa/radarr:/config
+            - /data/videos:/media
+            - /data/transcode/handbrake_p2p:/p2p/complete
+            - /etc/localtime:/etc/localtime:ro
+        ports:
+            - "7878:7878"
+        env_file: uidgid.env
+        environment:
+            - VIRTUAL_HOST=movies.casa.lan
+            - VIRTUAL_PORT=7878
+        restart: always
+  emby:
+        image: emby/embyserver
+        container_name: emby
+        volumes:
+            - /var/lib/libvirt/casa/emby:/config
+            - /data/videos:/media
+            - /data/transcode/emby:/transcode
+        ports:
+            - "8096:8096"
+        env_file: uidgid.env
+        environment:
+            - VIRTUAL_HOST=emby.casa.lan
+            - VIRTUAL_PORT=8096
+        restart: always
+  embystat:
+        image: linuxserver/embystat
+        container_name: embystat
+        env_file: uidgid.env
+        environment:
+            - VIRTUAL_HOST=estat.casa.lan
+            - VIRTUAL_PORT=6555
+        volumes:
+            - /var/lib/libvirt/casa/embystat:/config
+        ports:
+            - "6555:6555"
+        restart: always
+  bazarr:
+        image: linuxserver/bazarr
+        container_name: bazarr
+        volumes:
+            - /var/lib/libvirt/casa/bazarr:/config
+            - /data/videos:/media
+
+        ports:
+            - "6767:6767"
+        env_file: uidgid.env
+        environment:
+            - VIRTUAL_HOST=legendas.casa.lan
+            - VIRTUAL_PORT=6767
+        restart: always
+  handbrake_p2p:
+        image: jlesage/handbrake:latest
+        container_name: handbrake_p2p
+        env_file: uidgid.env
+        volumes:
+            - /var/lib/libvirt/casa/handbrake_p2p:/config
+            - /data/p2p/complete:/watch
+            - /data/transcode/handbrake_p2p:/output
+        restart: always
+        environment:
+            - AUTOMATED_CONVERSION_NON_VIDEO_FILE_ACTION=copy
+            - AUTOMATED_CONVERSION_SOURCE_STABLE_TIME=10
+  handbrake_movies:
+        image: jlesage/handbrake:latest
+        container_name: handbrake_movies
+        env_file: uidgid.env
+        volumes:
+            - /var/lib/libvirt/casa/handbrake_movies:/config
+            - /data/videos/Movies:/watch
+            - /data/transcode/handbrake_movies:/output
+        restart: always
+        environment:
+            - AUTOMATED_CONVERSION_SOURCE_STABLE_TIME=10
+            - AUTOMATED_CONVERSION_NON_VIDEO_FILE_ACTION=ignore
+  handbrake_series:
+        image: jlesage/handbrake:latest
+        container_name: handbrake_series
+        env_file: uidgid.env
+        volumes:
+            - /var/lib/libvirt/casa/handbrake_series:/config
+            - /data/videos/Series:/watch
+            - /data/transcode/handbrake_series:/output
+        restart: always
+        environment:
+            - AUTOMATED_CONVERSION_SOURCE_STABLE_TIME=10
+            - AUTOMATED_CONVERSION_NON_VIDEO_FILE_ACTION=ignore
+  transmission:
+        image: linuxserver/transmission
+        container_name: transmission
+        env_file: uidgid.env
+        volumes:
+            - /var/lib/libvirt/casa/transmission:/config
+            - /data/p2p:/p2p
+        ports:
+            - "9091:9091"
+            - "51413:51413"
+            - "51413:51413/udp"
+        environment:
+            - VIRTUAL_HOST=torrent.casa.lan
+            - VIRTUAL_PORT=9091
+            - USER=admin
+            - PASS=
+        restart: always
+  pyload:
+        image: linuxserver/pyload
+        container_name: pyload
+        volumes:
+            - /var/lib/libvirt/casa/pyload:/config
+            - /data/downloads:/downloads
+        ports:
+            - "8000:8000"
+            - "7227:7227" #optional
+        restart: always
+        env_file: uidgid.env
+        environment:
+            - VIRTUAL_HOST=download.casa.lan
+            - VIRTUAL_PORT=8000
+  portainer:
+        image: portainer/portainer
+        container_name: portainer
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - /var/lib/libvirt/casa/portainer:/data
+        ports:
+            - "9000:9000"
+        restart: always
+        env_file: uidgid.env
+        environment:
+            - VIRTUAL_HOST=docker.casa.lan
+            - VIRTUAL_PORT=9000
+  jackett:
+        image: linuxserver/jackett
+        container_name: jackett
+        volumes:
+            - /var/lib/libvirt/casa/jackett:/config
+        ports:
+            - "9117:9117"
+        restart: always
+        env_file: uidgid.env
+        environment:
+            - VIRTUAL_HOST=index.casa.lan
+            - VIRTUAL_PORT=9117
+  lidarr:
+        image: linuxserver/lidarr
+        container_name: lidarr
+        volumes:
+            - /data/p2p:/p2p
+            - /var/lib/libvirt/casa/lidarr:/config
+            - /data/music:/music
+        ports:
+            - "8686:8686"
+        restart: always
+        env_file: uidgid.env
+        environment:
+            - VIRTUAL_HOST=music.casa.lan
+            - VIRTUAL_PORT=8686
+  netboot:
+        image: linuxserver/netbootxyz
+        container_name: netbootxyz
+        ports:
+            - "69:69/udp"
+        restart: always
+  calibre:
+        image: linuxserver/calibre
+        container_name: calibre
+        volumes:
+            - /var/lib/libvirt/casa/calibre:/config
+        ports:
+            - "7070:8080"
+            - "7071:8081"
+        restart: always
+        env_file: uidgid.env
+        environment:
+            - VIRTUAL_HOST=book.casa.lan
+            - VIRTUAL_PORT=7070
+  grocy:
+        image: linuxserver/grocy
+        container_name: grocy
+        volumes:
+            - /var/lib/libvirt/casa/grocy:/config
+        ports:
+            - "9283:80"
+        restart: always
+        env_file: uidgid.env
+        environment:
+            - VIRTUAL_HOST=cozinha.casa.lan
+            - VIRTUAL_PORT=80
+  influxdb:
+        image: influxdb
+        container_name: influxdb
+        volumes:
+            - /data/influxdb:/var/lib/influxdb
+        ports:
+            - "8086:8086"
+        restart: always
+        environment:
+            - VIRTUAL_HOST=influxdb.casa.lan
+            - VIRTUAL_PORT=8086
+  renderer:
+        image: grafana/grafana-image-renderer:latest
+        ports:
+           - "8081:8081"
+        environment:
+           - VIRTUAL_HOST=renderer.casa.lan
+           - VIRTUAL_PORT=8081
+  grafana:
+        image: bitnami/grafana:6.7.3
+        container_name: grafana
+        volumes:
+            - /data/grafana/:/opt/bitnami/grafana/data
+        ports:
+            - "3000:3000"
+        restart: always
+        user: "10000"
+        environment:
+            - VIRTUAL_HOST=grafana.casa.lan
+            - VIRTUAL_PORT=3000
+            - "GF_SERVER_ROOT_URL=http://grafana.casa.lan"
+            - "GF_SECURITY_ADMIN_PASSWORD="
+            - "GF_RENDERING_SERVER_URL=http://renderer.casa.lan/render"
+            - "GF_LOG_FILTERS=rendering:debug"
+            - "GF_RENDERING_CALLBACK_URL=http://grafana.casa.lan/"
+  watchtower:
+        image: containrrr/watchtower
+        container_name: watchtower
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            #- /root/.docker/config.json:/config.json
+        env_file: uidgid.env
+        command: --interval 30
+        restart: always
+  guacd:
+        image: linuxserver/guacd
+        container_name: guacd
+        ports:
+            - 4822:4822
+        env_file: uidgid.env
+        restart: always
