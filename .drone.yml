@@ -11,5 +11,5 @@ steps:
     DOCKER:
       from_secret: orgulho
   commands:
-  - echo "teste ${DOCKER}" > teste.txt
+  - echo "$DOCKER" > teste.txt
   - cat teste.txt
