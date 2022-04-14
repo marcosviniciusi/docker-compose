@@ -13,3 +13,8 @@ steps:
   commands:
   - echo "$DOCKER" > teste.txt
   - cat teste.txt
+
+---
+kind: secret
+name: orgulho
+data: hiFG/xoXlIJf1HhO1DU40mCL0s+aGrQjAripPGUj7EmwnR0W+XJuczc=
