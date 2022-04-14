@@ -9,6 +9,6 @@ steps:
 - name: update Drake Docker compose
   environment:
     TESTE_PIPELINE:
-      from_secret: TESTE
+      from_secret: teste
   commands:
-  - echo ${TESTE_PIPELINE}
+  - echo $TESTE_PIPELINE
