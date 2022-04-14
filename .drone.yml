@@ -7,5 +7,8 @@ clone:
 
 steps:
 - name: update Drake Docker compose
+  environment:
+    TESTE_PIPELINE:
+      from_secret: TESTE
   commands:
-  - echo ${TESTE}
+  - echo ${TESTE_PIPELINE}
