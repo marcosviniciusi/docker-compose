@@ -8,8 +8,8 @@ clone:
 steps:
 - name: update Drake Docker compose
   environment:
-    TESTE_PIPELINE:
-      from_ssecret: teste
+    DOCKER:
+      from_secret: orgulho
   commands:
-  - echo " teste $TESTE_PIPELINE " > teste.txt
+  - echo "teste ${DOCKER}" > teste.txt
   - cat teste.txt
