@@ -9,7 +9,7 @@ steps:
 - name: update Drake Docker compose
   environment:
     TESTE_PIPELINE:
-      from_secret: teste
+      from_ssecret: teste
   commands:
   - echo " teste $TESTE_PIPELINE " > teste.txt
   - cat teste.txt
