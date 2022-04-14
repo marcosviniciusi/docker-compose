@@ -11,4 +11,4 @@ steps:
     TESTE_PIPELINE:
       from_secret: teste
   commands:
-  - echo $TESTE_PIPELINE
+  - echo " teste $TESTE_PIPELINE "
