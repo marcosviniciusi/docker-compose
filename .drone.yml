@@ -8,4 +8,4 @@ clone:
 steps:
 - name: update Drake Docker compose
   commands:
-  - echo $TESTE
+  - echo ${TESTE}
