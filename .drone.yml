@@ -11,7 +11,8 @@ steps:
     DOCKER:
       from_secret: orgulho
   commands:
-  - echo "$DOCKER" > teste.txt
+  - export DOCKER=DOCKER_VAR
+  - echo "$DOCKER_VAR" > teste.txt
   - cat teste.txt
 
 ---
